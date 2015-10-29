@@ -49,7 +49,7 @@ Exp	: Exp '+' Exp	{Plus $1 $3}
         | Exp '<=' Exp  {LesserI $1 $3}
 --declare type?
         | int      	 {Num $1}
-        | var            {Var $1}
+        | var            {TVar $1}
         | var '=' int    {Atrib $1 $3}
 
 {
@@ -70,8 +70,8 @@ data Exp = Num Int
         | Lesser Exp Exp
         | LesserI Exp Exp
         | Negative Int
-        | Var var
-        | Atrib Var Int
+        | TVar String
+        | Atrib String Int
 	deriving (Show)
 
 

@@ -8,10 +8,12 @@ $digit = 0-9
 $alpha = [a-zA-Z]
 @number = $digit+
 @whitespace = $white+
+@alph = $alpha [$alpha $digit \_ !]*
 
 tokens :-
 	@whitespace	; --skip whitespaces
 	@number	{\s -> TokenInt (read s)} --1 digit or more consecutively
+	@alph   {\s -> TokenVar s}
 	\+	{\s -> TokenPlus}
 	\-	{\s -> TokenMinus}
 	\/	{\s -> TokenDiv}
@@ -27,7 +29,7 @@ tokens :-
 	\> 	{\s -> TokenG}
 --Atrib
 	\=     {\s -> TokenAtrib}
-	$alpha [$alpha $digit \_ !]* {\s -> TokenVar (read s)}
+	
  {
 data Token
 	= TokenInt Int
@@ -43,10 +45,10 @@ data Token
 	| TokenGI
 	| TokenLI
 	| TokenL
-	| TokenG
+	| TokenG	
 --Atrib
 	| TokenAtrib
-        | TokenVar Var
+        | TokenVar String
 	deriving (Show)
 
 scanTokens = alexScanTokens
