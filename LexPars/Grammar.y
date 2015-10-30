@@ -48,6 +48,8 @@ Cmd     : var                 {Var $1}
         | '{' Cmd ';' Cmd '}' {Seq $2 $4}
         | '{' Cmd ';' '}'     {$2}
         | int                 {Nume $1}
+        | var '=' Exp         {Atri $1 $3 }
+
 
 
 Exp	: Exp '+' Exp	{Plus $1 $3}
@@ -88,6 +90,7 @@ data Exp = Num Int
 data Command = Var String
   | Nume Int
   | Atrib String Int
+  | Atri String Exp
   | Seq Command Command
   deriving (Show)
  
