@@ -53,20 +53,22 @@ while   {TokenWhile}--
 
 Prog        : SeqStatement    {$1}
 
-SeqStatement: SeqStatement Statement  {Seq $1 $2}
-            | Statement               {$1}
-
-Statement   : IFGrammar      {$1}
-            | Cmd            {$1}
-
-IFGrammar : if Exp Cmd                           { If $2 $3}
-          | if Exp Cmd else Cmd                  { IfElse $2 $3 $5}
+SeqStatement: SeqStatement Cmd  {Seq $1 $2}
+            | Cmd               {$1}
+           
 
 Cmd     : Cmd ';' Cmd         {Seq $1 $3 }
         | Cmd ';'             {$1}
         | '{' Cmd ';' Cmd '}' {Seq $2 $4}
         | '{' Cmd ';' '}'     {$2}
         |  var '=' Exp ';'    {Atrib $1 $3}
+        | IFGrammar      {$1}
+        | WhileGrammar   {$1}
+
+IFGrammar : if Exp Cmd                           { If $2 $3}
+          | if Exp Cmd else Cmd                  { IfElse $2 $3 $5}
+
+WhileGrammar: while Exp Cmd      {While $2 $3}
         
 
 Exp	: Exp '+' Exp	{Plus $1 $3}
@@ -115,6 +117,7 @@ data Command = Var String
  | Seq Command Command
  | If Exp Command
  | IfElse Exp Command Command
+ | While Exp Command 
   deriving (Show)
 
 }
