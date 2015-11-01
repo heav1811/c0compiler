@@ -20,6 +20,8 @@ int	{TokenInt $$}
 '||'    {TokenOr}
 '&&'	{TokenAnd}
 '!'	{TokenNeg}
+'!='    {TokenDiv} --
+'=='    {TokenEquals} --
 '>='	{TokenGI}
 '<='	{TokenLI}
 '<'	{TokenL}
@@ -30,6 +32,15 @@ var     {TokenVar $$}
 ')'     {TokenRB}
 '}'     {TokenLP}
 '{'     {TokenRP}
+float   {TokenFloat $$}
+bool    {TokenBool $$}--
+tint    {TokenTInt}
+tfloat  {TokenTFloat}--
+tbool   {TokenTBool}--
+if      {TokenIf}
+else    {TokenElse}
+while   {TokenWhile}--
+
 
 %nonassoc '>' '<' '<=' '>=' '!'
 %left '&&' '||'
@@ -40,17 +51,23 @@ var     {TokenVar $$}
 
 %%
 
+Prog        : SeqStatement    {$1}
 
-Cmd     : var                 {Var $1}
-        | Cmd ';' Cmd         {Seq $1 $3 }
-        | var '=' int         {Atrib $1 $3}
+SeqStatement: SeqStatement Statement  {Seq $1 $2}
+            | Statement               {$1}
+
+Statement   : IFGrammar      {$1}
+            | Cmd            {$1}
+
+IFGrammar : if Exp Cmd                           { If $2 $3}
+          | if Exp Cmd else Cmd                  { IfElse $2 $3 $5}
+
+Cmd     : Cmd ';' Cmd         {Seq $1 $3 }
         | Cmd ';'             {$1}
         | '{' Cmd ';' Cmd '}' {Seq $2 $4}
         | '{' Cmd ';' '}'     {$2}
-        | int                 {Nume $1}
-        | var '=' Exp         {Atri $1 $3 }
-
-
+        |  var '=' Exp ';'    {Atrib $1 $3}
+        
 
 Exp	: Exp '+' Exp	{Plus $1 $3}
 	| Exp '-' Exp	{Minus $1 $3}
@@ -67,12 +84,18 @@ Exp	: Exp '+' Exp	{Plus $1 $3}
         | Exp '<' Exp   {Lesser $1 $3}
         | Exp '<=' Exp  {LesserI $1 $3}
         | int           {Num $1}
+        | float         {NumFloat $1}
+
+-- Type    : tint                                     {TInt}
+--         | tfloat                                   {TFloat}
+--         | tbool                                    {TBool}
 {
 
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
 
 data Exp = Num Int 
+  | NumFloat Float
   | Plus Exp Exp
   | Minus Exp Exp
   | Times Exp Exp
@@ -88,11 +111,11 @@ data Exp = Num Int
   deriving (Show)
    
 data Command = Var String
-  | Nume Int
-  | Atrib String Int
-  | Atri String Exp
-  | Seq Command Command
+ | Atrib String Exp
+ | Seq Command Command
+ | If Exp Command
+ | IfElse Exp Command Command
   deriving (Show)
- 
+
 }
 	  

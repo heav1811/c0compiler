@@ -26,12 +26,15 @@ tokens :-
 	\|\|    {\s -> TokenOr}
 	&&	{\s -> TokenAnd}
 	\!	{\s -> TokenNeg}
-	\>\=  	{\s -> TokenGI}
-	\<\= 	{\s -> TokenLI}
+	\>=  	{\s -> TokenGI}
+	\<= 	{\s -> TokenLI}
 	\< 	{\s -> TokenL}
 	\> 	{\s -> TokenG}
+	true	{\s -> TokenBool True}
+	false 	{\s -> TokenBool False}
 --Atrib
 	\=      {\s -> TokenAtrib}
+	\==     {\s -> TokenEquals}
 --Types
 	int	{\s -> TokenTInt}
 	float	{\s -> TokenTFloat}
@@ -39,25 +42,29 @@ tokens :-
 	
 --Ifs
 	if	{\s -> TokenIf}
-	elseif  {\s -> TokenElseIf}
 	else	{\s -> TokenElse}
 --Misc
 	\;     {\s -> TokenSep}
+	\!=    {\s -> TokenDif}
 --While
 	while  {\s -> TokenWhile}
 --types and var's
-	@number	{\s -> TokenInt (read s)} --1 digit or more consecutively
-	@alph   {\s -> TokenVar s}
+	@number	            {\s -> TokenInt (read s)} --1 digit or more consecutively
+	@alph               {\s -> TokenVar s}
+        $digit+ "." $digit+ { \s -> TokenFloat (read s) }	
 	
 	
- {
+	{
 data Token
 --Expressions
 	= TokenInt Int
+	| TokenFloat Float
+	| TokenBool Bool
 	| TokenPlus
 	| TokenMinus
 	| TokenTimes
 	| TokenDiv
+	| TokenDif
 	| TokenMod
 --Brackets
 	| TokenLB
@@ -71,13 +78,13 @@ data Token
 	| TokenGI
 	| TokenLI
 	| TokenL
-	| TokenG	
+	| TokenG
+	| TokenEquals	
 --Atrib
 	| TokenAtrib
         | TokenVar String
 --Ifs
 	|TokenIf
-	|TokenElseIf
 	|TokenElse
 --while
 	|TokenWhile
