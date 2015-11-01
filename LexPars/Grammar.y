@@ -30,16 +30,16 @@ var     {TokenVar $$}
 ';'     {TokenSep}
 '('     {TokenLB}
 ')'     {TokenRB}
-'}'     {TokenLP}
-'{'     {TokenRP}
+'{'     {TokenLP}
+'}'     {TokenRP}
 float   {TokenFloat $$}
-bool    {TokenBool $$}--
+bool    {TokenBool $$}
 tint    {TokenTInt}
-tfloat  {TokenTFloat}--
-tbool   {TokenTBool}--
+tfloat  {TokenTFloat}
+tbool   {TokenTBool}
 if      {TokenIf}
 else    {TokenElse}
-while   {TokenWhile}--
+while   {TokenWhile}
 
 
 %nonassoc '>' '<' '<=' '>=' '!'
@@ -48,26 +48,24 @@ while   {TokenWhile}--
 %left '*' '/' '%'
 %left ';'
 
-
 %%
 
-Prog        : SeqStatement    {$1}
+Cmd     : tint var '=' Exp    {DecE (TVar TInt $2) $4}
+        | tbool var '=' Exp   {DecE (TVar TBool $2) $4}
+        | tfloat var '=' Exp  {DecE (TVar TFloat $2) $4}
+        | tint var            {Dec (TVar TInt $2)}
+        | tbool var           {Dec (TVar TBool $2)}
+        | tfloat var          {Dec (TVar TFloat $2)}
+        | var '=' Exp         {Atrib (SVar $1) $3}
+        | IFGrammar           {$1}
+        | WhileGrammar        {$1}
+        | Cmd ';' Cmd         {Seq $1 $3}
+        | Cmd ';'             {$1}
 
-SeqStatement: SeqStatement Cmd     {Seq $1 $2}
-            | Cmd                  {$1}
-        
+IFGrammar : if Exp '{' Cmd '}'                   {If $2 $4}
+          | if Exp '{' Cmd '}' else '{' Cmd '}'  {IfElse $2 $4 $8}
 
-Cmd     : '{' Cmd ';' Cmd '}'  {Seq $2 $4}
-        | '{' Cmd ';' '}'      {$2}  
-        | var '=' Exp ';'    {Atrib (Var $1) $3}
-        | var             {Var $1}
-        | IFGrammar      {$1}
-        | WhileGrammar   {$1}
-
-IFGrammar : if Exp Cmd                           { If $2 $3}
-          | if Exp Cmd else Cmd                  { IfElse $2 $3 $5}
-
-WhileGrammar: while Exp Cmd    {While $2 $3}
+WhileGrammar: while Exp '{' Cmd '}'              {While $2 $4}
         
 
 Exp	: Exp '+' Exp	{Plus $1 $3}
@@ -86,17 +84,26 @@ Exp	: Exp '+' Exp	{Plus $1 $3}
         | Exp '<=' Exp  {LesserI $1 $3}
         | int           {Num $1}
         | float         {NumFloat $1}
+        | bool          {EBool $1}
+        | var           {EVar (SVar $1)}
 
--- Type    : tint                                     {TInt}
---         | tfloat                                   {TFloat}
---         | tbool                                    {TBool}
 {
 
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
 
+data Type = TInt
+  | TBool
+  | TFloat
+  deriving (Show)
+
+data Var = SVar String
+  | TVar Type String
+  deriving (Show)
+
 data Exp = Num Int 
   | NumFloat Float
+  | EBool Bool
   | Plus Exp Exp
   | Minus Exp Exp
   | Times Exp Exp
@@ -109,14 +116,16 @@ data Exp = Num Int
   | Lesser Exp Exp
   | LesserI Exp Exp
   | Negative Exp
+  | EVar Var
   deriving (Show)
    
-data Command = Var String
- | Atrib Command Exp
- | Seq Command Command
- | If Exp Command
- | IfElse Exp Command Command
- | While Exp Command 
+data Command = Atrib Var Exp
+  | DecE Var Exp
+  | Dec Var
+  | Seq Command Command
+  | If Exp Command
+  | IfElse Exp Command Command
+  | While Exp Command 
   deriving (Show)
 
 }

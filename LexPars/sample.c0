@@ -1,0 +1,6 @@
+int result = 1;
+int i = 0;
+while (i < e) {
+  result = result * b;
+  i = i+1;
+}
