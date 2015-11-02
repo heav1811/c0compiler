@@ -20,8 +20,8 @@ int	{TokenInt $$}
 '||'    {TokenOr}
 '&&'	{TokenAnd}
 '!'	{TokenNeg}
-'!='    {TokenDiv} --
-'=='    {TokenEquals} --
+'!='    {TokenDiv} 
+'=='    {TokenEquals} 
 '>='	{TokenGI}
 '<='	{TokenLI}
 '<'	{TokenL}
@@ -42,7 +42,7 @@ else    {TokenElse}
 while   {TokenWhile}
 
 
-%nonassoc '>' '<' '<=' '>=' '!'
+%nonassoc '>' '<' '<=' '>=' '!' '!=' '=='
 %left '&&' '||'
 %left '+' '-'
 %left '*' '/' '%'
@@ -62,10 +62,11 @@ Cmd     : tint var '=' Exp    {DecE (TVar TInt $2) $4}
         | Cmd ';' Cmd         {Seq $1 $3}
         | Cmd ';'             {$1}
 
-IFGrammar : if Exp '{' Cmd '}'                   {If $2 $4}
-          | if Exp '{' Cmd '}' else '{' Cmd '}'  {IfElse $2 $4 $8}
+IFGrammar : if '(' Exp ')' '{' Cmd '}'                   {If $3 $6}
+          | if '(' Exp ')' ';'                           {IF $3} 
+          | if '(' Exp ')' '{' Cmd '}' else '{' Cmd '}'  {IfElse $3 $6 $10}
 
-WhileGrammar: while Exp '{' Cmd '}'              {While $2 $4}
+WhileGrammar: while '(' Exp ')' '{' Cmd '}'              {While $3 $6}
         
 
 Exp	: Exp '+' Exp	{Plus $1 $3}
@@ -73,8 +74,9 @@ Exp	: Exp '+' Exp	{Plus $1 $3}
 	| Exp '*' Exp	{Times $1 $3}
 	| Exp '/' Exp	{Div $1 $3}
         | Exp '%' Exp   {Mod $1 $3}
+        | Exp '==' Exp  {TEquals $1 $3}
+        | Exp '!=' Exp  {TDif $1 $3}
         | '!' Exp       {Negative $2}
-        | '(' Exp ')'   { $2 }
 --binop
         | Exp '||' Exp  {Or $1 $3}
         | Exp '&&' Exp  {And $1 $3}
@@ -97,8 +99,8 @@ data Type = TInt
   | TFloat
   deriving (Show)
 
-data Var = SVar String
-  | TVar Type String
+data Var = SVar String     -- Simple Var
+  | TVar Type String       -- Typed var
   deriving (Show)
 
 data Exp = Num Int 
@@ -110,20 +112,23 @@ data Exp = Num Int
   | Div Exp Exp
   | Mod Exp Exp
   | Or Exp Exp
+  | TDif Exp Exp
+  | TEquals Exp Exp
   | And Exp Exp
   | Greater Exp Exp
   | GreaterI Exp Exp
   | Lesser Exp Exp
   | LesserI Exp Exp
   | Negative Exp
-  | EVar Var
+  | EVar Var             --Expression Var
   deriving (Show)
    
 data Command = Atrib Var Exp
-  | DecE Var Exp
-  | Dec Var
+  | DecE Var Exp         -- Declare type in expression
+  | Dec Var              -- Declare var
   | Seq Command Command
   | If Exp Command
+  | IF Exp
   | IfElse Exp Command Command
   | While Exp Command 
   deriving (Show)
