@@ -63,10 +63,11 @@ Cmd     : tint var '=' Exp    {DecE (TVar TInt $2) $4}
         | Cmd ';'             {$1}
 
 IFGrammar : if '(' Exp ')' '{' Cmd '}'                   {If $3 $6}
-          | if '(' Exp ')' ';'                           {IF $3} 
+          | if '(' Exp ')' ';'                           {IfNull $3} 
           | if '(' Exp ')' '{' Cmd '}' else '{' Cmd '}'  {IfElse $3 $6 $10}
 
 WhileGrammar: while '(' Exp ')' '{' Cmd '}'              {While $3 $6}
+            | while '(' Exp ')' ';'                      {WhileNull $3}
         
 
 Exp	: Exp '+' Exp	{Plus $1 $3}
@@ -128,7 +129,8 @@ data Command = Atrib Var Exp
   | Dec Var              -- Declare var
   | Seq Command Command
   | If Exp Command
-  | IF Exp
+  | IfNull Exp
+  | WhileNull Exp
   | IfElse Exp Command Command
   | While Exp Command 
   deriving (Show)
