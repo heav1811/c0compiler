@@ -39,13 +39,15 @@ tokens :-
 	int	{\s -> TokenTInt}
 	float	{\s -> TokenTFloat}
 	bool	{\s -> TokenTBool}
-	
+-- main
+	main    {\s -> TokenMain}
+        return  {\s -> TokenRet}
 --Ifs
 	if	{\s -> TokenIf}
 	else	{\s -> TokenElse}
 --Misc
-	\;     {\s -> TokenSep}
-	\!=    {\s -> TokenDif}
+	\;      {\s -> TokenSep}
+	\!=     {\s -> TokenDif}  
 --While
 	while  {\s -> TokenWhile}
 --types and var's
@@ -93,6 +95,8 @@ data Token
 	|TokenTInt
 	|TokenTFloat
 	|TokenTBool
+	|TokenMain
+        |TokenRet
 	deriving (Show)
 
 
