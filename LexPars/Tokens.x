@@ -52,15 +52,12 @@ tokens :-
 	while  {\s -> TokenWhile}
 --types and var's
 	@number	            {\s -> TokenInt (read s)} --1 digit or more consecutively
-	@alph               {\s -> TokenVar s}
-        $digit+ "." $digit+ { \s -> TokenFloat (read s) }	
-	
+	@alph               {\s -> TokenVar s}	
 	
 	{
 data Token
 --Expressions
 	= TokenInt Int
-	| TokenFloat Float
 	| TokenBool Bool
 	| TokenPlus
 	| TokenMinus
@@ -93,7 +90,6 @@ data Token
         |TokenSep
 --Types
 	|TokenTInt
-	|TokenTFloat
 	|TokenTBool
 	|TokenMain
         |TokenRet

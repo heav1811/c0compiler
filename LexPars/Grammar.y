@@ -32,10 +32,8 @@ var     {TokenVar $$}
 ')'     {TokenRB}
 '{'     {TokenLP}
 '}'     {TokenRP}
-float   {TokenFloat $$}
 bool    {TokenBool $$}
 tint    {TokenTInt}
-tfloat  {TokenTFloat}
 tbool   {TokenTBool}
 if      {TokenIf}
 else    {TokenElse}
@@ -54,23 +52,17 @@ return  {TokenRet}
 MAIN:     typed                {$1}
 
 typed   : tint main '('')''{' Cmd return int ';' '}'           {Main TInt $6}
-        | tfloat main '('')''{' Cmd return float ';' '}'       {Main TFloat $6}
         | tbool main '('')''{' Cmd return bool ';' '}'         {Main TBool $6}
 
 Ucmd    : tint var '=' Exp    {DecE (TVar TInt $2) $4}
         | tbool var '=' Exp   {DecE (TVar TBool $2) $4}
-        | tfloat var '=' Exp  {DecE (TVar TFloat $2) $4}
         | tint var            {Dec (TVar TInt $2)}
         | tbool var           {Dec (TVar TBool $2)}
-        | tfloat var          {Dec (TVar TFloat $2)}
         | var '=' Exp         {Atrib (SVar $1) $3}
 
 Cmd     : tint var '=' Exp    {DecE (TVar TInt $2) $4}
-        | tbool var '=' Exp   {DecE (TVar TBool $2) $4}
-        | tfloat var '=' Exp  {DecE (TVar TFloat $2) $4}
         | tint var            {Dec (TVar TInt $2)}
         | tbool var           {Dec (TVar TBool $2)}
-        | tfloat var          {Dec (TVar TFloat $2)}
         | var '=' Exp         {Atrib (SVar $1) $3}
         | CICLES              {$1}
         | Cmd ';' Cmd         {Seq $1 $3}
@@ -108,7 +100,6 @@ Exp	: Exp '+' Exp	{Plus $1 $3}
         | Exp '<' Exp   {Lesser $1 $3}
         | Exp '<=' Exp  {LesserI $1 $3}
         | int           {Num $1}
-        | float         {NumFloat $1}
         | bool          {EBool $1}
         | var           {EVar (SVar $1)}
 
@@ -119,7 +110,6 @@ parseError _ = error "Parse error"
 
 data Type = TInt
   | TBool
-  | TFloat
   deriving (Show)
 
 data Var = SVar String     -- Simple Var
@@ -127,7 +117,6 @@ data Var = SVar String     -- Simple Var
   deriving (Show)
 
 data Exp = Num Int 
-  | NumFloat Float
   | EBool Bool
   | Plus Exp Exp
   | Minus Exp Exp
