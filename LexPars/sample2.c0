@@ -1,0 +1,72 @@
+int main() {
+  int tot = read();
+  int i = 0;
+
+  while (i < tot) {
+    int j = 0;
+    while (j < tot - i - 1) {
+      printint(1);
+      j = j + 1;
+    }
+
+    j = 0;
+    while (j < i * 2 + 1) {
+      printint(0);
+      j = j + 1;
+    }
+
+    j = 0;
+    while (j < tot - i - 1) {
+      printint(1);
+      j = j + 1;
+    }
+
+    println();
+    i = i + 1;
+  }
+
+  i = 1;
+  int j = 0;
+  while (j < tot - i - 1) {
+    printint(1);
+    j = j + 1;
+  }
+
+  j = 0;
+  while (j < i * 2 + 1) {
+    printint(0);
+    j = j + 1;
+  }
+
+  j = 0;
+  while (j < tot - i - 1) {
+    printint(1);
+    j = j + 1;
+  }
+
+  println();
+
+  i = tot - 1;
+  int j = 0;
+  while (j < tot - i - 1) {
+    printint(1);
+    j = j + 1;
+  }
+
+  j = 0;
+  while (j < i * 2 + 1) {
+    printint(0);
+    j = j + 1;
+  }
+
+  j = 0;
+  while (j < tot - i - 1) {
+    printint(1);
+    j = j + 1;
+  }
+
+  println();
+
+
+  return 0;
+}

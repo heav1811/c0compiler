@@ -38,6 +38,9 @@ tbool   {TokenTBool}
 if      {TokenIf}
 else    {TokenElse}
 while   {TokenWhile}
+print   {TokenPrint}
+println {TokenPrintLn}
+read    {TokenRead}
 main    {TokenMain}
 return  {TokenRet}
 
@@ -45,7 +48,7 @@ return  {TokenRet}
 %left '&&' '||'
 %left '+' '-'
 %left '*' '/' '%'
-%left ';'x
+%left ';'
 
 %%
 
@@ -54,19 +57,24 @@ MAIN:     typed                {$1}
 typed   : tint main '('')''{' Cmd return int ';' '}'           {Main TInt $6}
         | tbool main '('')''{' Cmd return bool ';' '}'         {Main TBool $6}
 
+Cmd     : tint var '=' Exp    {DecE (TVar TInt $2) $4}
+        | tint var            {Dec (TVar TInt $2)}
+        | tbool var           {Dec (TVar TBool $2)}
+        | var '=' Exp         {Atrib (SVar $1) $3}
+        | print '(' Exp ')'   {Print $3}
+        | println '(' ')'     {PrintLn}
+        | CICLES              {$1}
+        | CICLES Cmd          {Seq $1 $2}
+        | Cmd ';' Cmd         {Seq $1 $3}
+        | Cmd ';'             {$1}
+
 Ucmd    : tint var '=' Exp    {DecE (TVar TInt $2) $4}
         | tbool var '=' Exp   {DecE (TVar TBool $2) $4}
         | tint var            {Dec (TVar TInt $2)}
         | tbool var           {Dec (TVar TBool $2)}
         | var '=' Exp         {Atrib (SVar $1) $3}
-
-Cmd     : tint var '=' Exp    {DecE (TVar TInt $2) $4}
-        | tint var            {Dec (TVar TInt $2)}
-        | tbool var           {Dec (TVar TBool $2)}
-        | var '=' Exp         {Atrib (SVar $1) $3}
-        | CICLES              {$1}
-        | Cmd ';' Cmd         {Seq $1 $3}
-        | Cmd ';'             {$1}
+        | print '(' Exp ')'   {Print $3}
+        | println '(' ')'     {PrintLn}
 
 
 CICLES  : IFGrammar           {$1}
@@ -102,6 +110,7 @@ Exp	: Exp '+' Exp	{Plus $1 $3}
         | int           {Num $1}
         | bool          {EBool $1}
         | var           {EVar (SVar $1)}
+        | read '(' ')'  {Read}
 
 {
 
@@ -133,6 +142,7 @@ data Exp = Num Int
   | LesserI Exp Exp
   | Negative Exp
   | EVar Var             --Expression Var
+  | Read
   deriving (Show)
    
 data Command = Atrib Var Exp
@@ -142,14 +152,14 @@ data Command = Atrib Var Exp
   | If Exp Command
   | IfC Exp Command
   | IfNull Exp
-  | WhileNull Exp
   | IfElse Exp Command Command
   | IfElseC Exp Command Command
+  | WhileNull Exp
   | While Exp Command
   | WhileC Exp Command
+  | Print Exp
+  | PrintLn
   | Main Type Command
   deriving (Show)
-
-
 }
-	  
+

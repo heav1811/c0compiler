@@ -1,6 +1,11 @@
-int result = 1;
-int i = 0;
-while (i < e) {
-  result = result * b;
-  i = i+1;
+int main() {
+ result = 1;
+ i = 0;
+ while (i<3) {
+   result = result + 3;
+   i = i+1;
+ }
+
+ printint(result);
+ return 0;
 }

@@ -37,7 +37,6 @@ tokens :-
 	\==     {\s -> TokenEquals}
 --Types
 	int	{\s -> TokenTInt}
-	float	{\s -> TokenTFloat}
 	bool	{\s -> TokenTBool}
 -- main
 	main    {\s -> TokenMain}
@@ -50,6 +49,10 @@ tokens :-
 	\!=     {\s -> TokenDif}  
 --While
 	while  {\s -> TokenWhile}
+--Print
+	printint  {\s -> TokenPrint}
+	println   {\s -> TokenPrintLn}
+	read      {\s -> TokenRead}
 --types and var's
 	@number	            {\s -> TokenInt (read s)} --1 digit or more consecutively
 	@alph               {\s -> TokenVar s}	
@@ -88,6 +91,10 @@ data Token
 --while
 	|TokenWhile
         |TokenSep
+--print
+        |TokenPrint
+        |TokenPrintLn
+        |TokenRead
 --Types
 	|TokenTInt
 	|TokenTBool
